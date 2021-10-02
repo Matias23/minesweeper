@@ -7,6 +7,8 @@ import com.mricotta.minesweeper.rest.dto.GameRules;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
@@ -27,35 +29,35 @@ public class MinesweeperService {
         return getCellEntityByCoordinates(x,y).map(this::toCellDTO);
     }
 
-    public Cell visitCellByCoordinates(int x, int y) {
+    public ResponseEntity visitCellByCoordinates(int x, int y) {
         CellEntity cellEntity = cellRepository.findOneByCoordinate(x, y).orElse(null);
         if (cellEntity == null) {
-            //TODO cell is out of limits, print some error;
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         if (cellEntity.isVisited()) {
-            //TODO user has already visited it, should do nothing
+            return new ResponseEntity(HttpStatus.OK);
         }
         if (cellEntity.isMined()) {
-            //TODO endgame
+            return new ResponseEntity(HttpStatus.CONFLICT);
         }
         cellEntity.setVisited(true);
-        return toCellDTO(cellRepository.save(cellEntity));
+        return new ResponseEntity(toCellDTO(cellRepository.save(cellEntity)), HttpStatus.OK);
     }
 
-    public Cell flagCellByCoordinates(int x, int y) {
+    public ResponseEntity<Cell> flagCellByCoordinates(int x, int y) {
         CellEntity cellEntity = cellRepository.findOneByCoordinate(x, y).orElse(null);
         if (cellEntity == null) {
-            //TODO cell is out of limits, print some error;
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         cellEntity.setFlagged(true);
-        return toCellDTO(cellRepository.save(cellEntity));
+        return new ResponseEntity(toCellDTO(cellRepository.save(cellEntity)), HttpStatus.OK);
     }
 
     private Cell toCellDTO(CellEntity entity) {
         return Cell.builder().build();
     }
 
-    public void initializeGame(GameRules gameRules) {
+    public ResponseEntity initializeGame(GameRules gameRules) {
         ////Creating all the cell entities
         createCells(gameRules);
 
@@ -64,6 +66,8 @@ public class MinesweeperService {
 
         //Setting adjacent bombs number
         settingAdjacentNumber(gameRules);
+
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 
     private void createCells(GameRules gameRules) {

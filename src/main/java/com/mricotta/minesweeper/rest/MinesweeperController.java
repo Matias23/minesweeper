@@ -4,6 +4,7 @@ import com.mricotta.minesweeper.rest.dto.Cell;
 import com.mricotta.minesweeper.rest.dto.GameRules;
 import com.mricotta.minesweeper.service.MinesweeperService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,18 +28,18 @@ public class MinesweeperController {
     }
 
     @RequestMapping(value = {"/visit/{x:\\d+}/{y:\\d+}"}, method = RequestMethod.PUT)
-    public Cell visitCellByCoordinates(@PathVariable int x, @PathVariable int y) {
+    public ResponseEntity<Cell> visitCellByCoordinates(@PathVariable int x, @PathVariable int y) {
         return minesweeperService.visitCellByCoordinates(x, y);
     }
 
     @RequestMapping(value = {"/flag/{x:\\d+}/{y:\\d+}"}, method = RequestMethod.PUT)
-    public Cell flagCellByCoordinates(@PathVariable int x, @PathVariable int y) {
+    public ResponseEntity<Cell> flagCellByCoordinates(@PathVariable int x, @PathVariable int y) {
         return minesweeperService.flagCellByCoordinates(x, y);
     }
 
     @RequestMapping(value = {"/newGame"}, method = RequestMethod.POST)
-    public void initializeGame(@RequestBody GameRules gameRules) {
-        minesweeperService.initializeGame(gameRules);
+    public ResponseEntity initializeGame(@RequestBody GameRules gameRules) {
+        return minesweeperService.initializeGame(gameRules);
     }
 
 }
