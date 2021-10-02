@@ -31,6 +31,12 @@ public class GameEntity {
     @Column(name = "gameId")
     private long gameId;
 
+    @Column(name = "width")
+    private int width;
+
+    @Column(name = "height")
+    private int height;
+
     @OneToOne
     @JoinColumn(name = "userId")
     private UserEntity userEntity;

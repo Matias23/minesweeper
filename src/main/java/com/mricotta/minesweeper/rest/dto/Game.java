@@ -16,4 +16,6 @@ import lombok.ToString;
 public class Game {
 
     private Long gameId;
+    private int width;
+    private int height;
 }

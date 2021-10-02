@@ -42,7 +42,7 @@ public class UserService {
 
     public ResponseEntity<Game> initializeGame(long userId, GameRules gameRules) {
         UserEntity userEntity = userRepository.getById(userId);
-        GameEntity gameEntity = GameEntity.builder().userEntity(userEntity).build();
+        GameEntity gameEntity = GameEntity.builder().width(gameRules.getWidth()).height(gameRules.getHeight()).userEntity(userEntity).build();
         gameService.initializeGame(gameEntity, gameRules);
         return gameService.createGame(gameEntity);
     }
