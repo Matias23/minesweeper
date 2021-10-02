@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @EnableAsync
@@ -23,7 +24,7 @@ public class MinesweeperService {
     private final CellRepository cellRepository;
 
     public Optional<Cell> getCellByCoordinates(int x, int y) {
-        return cellRepository.findOneByCoordinate(x, y).map(this::toCellDTO);
+        return getCellEntityByCoordinates(x,y).map(this::toCellDTO);
     }
 
     public Cell visitCellByCoordinates(int x, int y) {
@@ -67,8 +68,8 @@ public class MinesweeperService {
 
     private void createCells(GameRules gameRules) {
         CellEntity cellEntity;
-        for (int row = 0; row < gameRules.getSize(); row++) {
-            for (int column = 0; column < gameRules.getSize(); column++) {
+        for (int row = 0; row < gameRules.getHeight(); row++) {
+            for (int column = 0; column < gameRules.getWidth(); column++) {
                 cellEntity = CellEntity.builder()
                         .isVisited(false)
                         .isFlagged(false)
@@ -82,25 +83,51 @@ public class MinesweeperService {
 
     private void putBombs(GameRules gameRules) {
         int mines = gameRules.getMines();
+        int numberOfCells = gameRules.getHeight() * gameRules.getWidth() - 1;
         while (mines > 0) {
-            //TODO get new bomb coordinates in a random way
-            int x = -1;
-            int y = -1;
-            CellEntity minedCell = cellRepository.findOneByCoordinate(x, y).orElse(null);
+            Random r = new Random();
+            int randomNumber = r.nextInt(numberOfCells);
+            int randomRow = (int)Math.floor(randomNumber / gameRules.getWidth());
+            int randomColumn = randomNumber % gameRules.getWidth();
+            CellEntity minedCell = cellRepository.findOneByCoordinate(randomRow, randomColumn).orElse(null);
+            if (minedCell.isMined()) {
+                continue;
+            }
             minedCell.setMined(true);
             cellRepository.save(minedCell);
+            mines--;
         }
     }
 
     private void settingAdjacentNumber(GameRules gameRules) {
-        for (int row = 0; row < gameRules.getSize(); row++) {
-            for (int column = 0; column < gameRules.getSize(); column++) {
-                CellEntity minedCell = cellRepository.findOneByCoordinate(row, column).orElse(null);
-                //TODO think a way of calculating this value
-                int adjacentMines = -1;
-                minedCell.setAdjacentMines(adjacentMines);
-                cellRepository.save(minedCell);
+        for (int row = 0; row < gameRules.getHeight(); row++) {
+            for (int column = 0; column < gameRules.getWidth(); column++) {
+                CellEntity cell = cellRepository.findOneByCoordinate(row, column).orElse(null);
+                //TODO think a better way of calculating this value
+                int adjacentMines = 0;
+                adjacentMines += countMine(row - 1, column, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += countMine(row - 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += countMine(row - 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += countMine(row + 1, column, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += countMine(row + 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += countMine(row + 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += countMine(row, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += countMine(row, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                cell.setAdjacentMines(adjacentMines);
+                cellRepository.save(cell);
             }
         }
+    }
+
+    private int countMine(int xpos, int ypos, int maxWidth, int maxHeight) {
+        if (xpos < 0 || ypos < 0 || xpos >= maxWidth || ypos >= maxHeight) {
+            return 0;
+        }
+        CellEntity cellEntity = getCellEntityByCoordinates(xpos, ypos).orElse(null);
+        return cellEntity.isMined() ? 1 : 0;
+    }
+
+    private Optional<CellEntity> getCellEntityByCoordinates(int x, int y) {
+        return cellRepository.findOneByCoordinate(x, y);
     }
 }

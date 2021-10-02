@@ -15,6 +15,7 @@ import lombok.ToString;
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessivePublicCount", "PMD.SingularField"})
 public class GameRules {
 
-    private int size;
+    private int width;
+    private int height;
     private int mines;
 }
