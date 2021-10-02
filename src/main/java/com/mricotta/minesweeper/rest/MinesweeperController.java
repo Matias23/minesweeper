@@ -1,10 +1,12 @@
 package com.mricotta.minesweeper.rest;
 
 import com.mricotta.minesweeper.rest.dto.Cell;
+import com.mricotta.minesweeper.rest.dto.GameRules;
 import com.mricotta.minesweeper.service.MinesweeperService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +34,11 @@ public class MinesweeperController {
     @RequestMapping(value = {"/flag/{x:\\d+}/{y:\\d+}"}, method = RequestMethod.PUT)
     public Cell flagCellByCoordinates(@PathVariable int x, @PathVariable int y) {
         return minesweeperService.flagCellByCoordinates(x, y);
+    }
+
+    @RequestMapping(value = {"/newGame"}, method = RequestMethod.POST)
+    public void initializeGame(@RequestBody GameRules gameRules) {
+        minesweeperService.initializeGame(gameRules);
     }
 
 }

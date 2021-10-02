@@ -28,11 +28,11 @@ public class CellEntity {
 
     @NotNull
     @Column(name = "xpos")
-    private Long xpos;
+    private int xpos;
 
     @NotNull
     @Column(name = "ypos")
-    private Long ypos;
+    private int ypos;
 
     @NotNull
     @Column(name = "isMined")
@@ -46,5 +46,7 @@ public class CellEntity {
     @Column(name = "isFlagged")
     private boolean isFlagged;
 
-    // TODO verify if this should be stored or calculated private int adjacentMines;
+    @NotNull
+    @Column(name = "adjacentMines")
+    private int adjacentMines;
 }

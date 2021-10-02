@@ -13,13 +13,8 @@ import lombok.ToString;
 @ToString
 @Builder
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessivePublicCount", "PMD.SingularField"})
-public class Cell {
+public class GameRules {
 
-    private Long id;
-    private int xpos;
-    private int ypos;
-    private boolean isMined;
-    private boolean isVisited;
-    private boolean isFlagged;
-    private int adjacentMines;
+    private int size;
+    private int mines;
 }

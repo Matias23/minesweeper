@@ -3,6 +3,7 @@ package com.mricotta.minesweeper.service;
 import com.mricotta.minesweeper.domain.CellEntity;
 import com.mricotta.minesweeper.repository.CellRepository;
 import com.mricotta.minesweeper.rest.dto.Cell;
+import com.mricotta.minesweeper.rest.dto.GameRules;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,5 +52,24 @@ public class MinesweeperService {
 
     private Cell toCellDTO(CellEntity entity) {
         return Cell.builder().build();
+    }
+
+    public void initializeGame(GameRules gameRules) {
+        CellEntity cellEntity;
+        //Creating all the cell entities
+        for (int row = 0; row < gameRules.getSize(); row++) {
+            for (int column = 0; column < gameRules.getSize(); column++) {
+                cellEntity = CellEntity.builder()
+                    .isVisited(false)
+                    .isFlagged(false)
+                    .xpos(column)
+                    .ypos(row)
+                    .build();
+                cellRepository.save(cellEntity);
+            }
+        }
+        int mines = gameRules.getMines();
+
+        //We also need to set the adjacent bombs number
     }
 }
