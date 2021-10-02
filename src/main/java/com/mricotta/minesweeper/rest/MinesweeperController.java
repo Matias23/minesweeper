@@ -42,4 +42,8 @@ public class MinesweeperController {
         return minesweeperService.initializeGame(gameRules);
     }
 
+    @RequestMapping(value = {"/reset"}, method = RequestMethod.POST)
+    public ResponseEntity resetGame() {
+        return minesweeperService.resetGame();
+    }
 }

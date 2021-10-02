@@ -4,6 +4,7 @@ import com.mricotta.minesweeper.domain.CellEntity;
 import com.mricotta.minesweeper.repository.CellRepository;
 import com.mricotta.minesweeper.rest.dto.Cell;
 import com.mricotta.minesweeper.rest.dto.GameRules;
+import com.sun.xml.internal.bind.v2.TODO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,11 +59,17 @@ public class MinesweeperService {
     }
 
     public ResponseEntity initializeGame(GameRules gameRules) {
+        int numberOfCells = gameRules.getHeight() * gameRules.getWidth() - 1;
+
+        //The game cannot be player if all cells are mined
+        if (gameRules.getMines() >= numberOfCells) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
         ////Creating all the cell entities
         createCells(gameRules);
 
         //Setting the bombs
-        putBombs(gameRules);
+        putBombs(gameRules, numberOfCells);
 
         //Setting adjacent bombs number
         settingAdjacentNumber(gameRules);
@@ -85,9 +92,8 @@ public class MinesweeperService {
         }
     }
 
-    private void putBombs(GameRules gameRules) {
+    private void putBombs(GameRules gameRules, int numberOfCells) {
         int mines = gameRules.getMines();
-        int numberOfCells = gameRules.getHeight() * gameRules.getWidth() - 1;
         while (mines > 0) {
             Random r = new Random();
             int randomNumber = r.nextInt(numberOfCells);
@@ -107,23 +113,24 @@ public class MinesweeperService {
         for (int row = 0; row < gameRules.getHeight(); row++) {
             for (int column = 0; column < gameRules.getWidth(); column++) {
                 CellEntity cell = cellRepository.findOneByCoordinate(row, column).orElse(null);
-                //TODO think a better way of calculating this value
+                /* TODO think a better way of calculating this value, since cell at the corners and borders
+                will only have 3/5 adjacent cells*/
                 int adjacentMines = 0;
-                adjacentMines += countMine(row - 1, column, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += countMine(row - 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += countMine(row - 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += countMine(row + 1, column, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += countMine(row + 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += countMine(row + 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += countMine(row, column + 1, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += countMine(row, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += searchMine(row - 1, column, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += searchMine(row - 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += searchMine(row - 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += searchMine(row + 1, column, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += searchMine(row + 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += searchMine(row + 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += searchMine(row, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                adjacentMines += searchMine(row, column - 1, gameRules.getWidth(), gameRules.getHeight());
                 cell.setAdjacentMines(adjacentMines);
                 cellRepository.save(cell);
             }
         }
     }
 
-    private int countMine(int xpos, int ypos, int maxWidth, int maxHeight) {
+    private int searchMine(int xpos, int ypos, int maxWidth, int maxHeight) {
         if (xpos < 0 || ypos < 0 || xpos >= maxWidth || ypos >= maxHeight) {
             return 0;
         }
@@ -133,5 +140,10 @@ public class MinesweeperService {
 
     private Optional<CellEntity> getCellEntityByCoordinates(int x, int y) {
         return cellRepository.findOneByCoordinate(x, y);
+    }
+
+    public ResponseEntity resetGame() {
+        cellRepository.deleteAll();
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
