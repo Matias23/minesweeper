@@ -28,7 +28,7 @@ import java.util.List;
 public class GameEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "gameId")
+    @Column(name = "game_id")
     private long gameId;
 
     @Column(name = "width")
@@ -38,7 +38,7 @@ public class GameEntity {
     private int height;
 
     @OneToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private UserEntity userEntity;
 
     @OneToMany(mappedBy = "gameEntity", cascade = CascadeType.ALL, orphanRemoval = true)

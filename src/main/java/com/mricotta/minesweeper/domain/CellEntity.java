@@ -25,34 +25,34 @@ import javax.persistence.Table;
 public class CellEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
+    @Column(name = "cell_id")
     private Long id;
 
     @NotNull
-    @Column(name = "xpos")
+    @Column(name = "x_pos")
     private int xpos;
 
     @NotNull
-    @Column(name = "ypos")
+    @Column(name = "y_pos")
     private int ypos;
 
     @NotNull
-    @Column(name = "isMined")
+    @Column(name = "is_mined")
     private boolean isMined;
 
     @NotNull
-    @Column(name = "isVisited")
+    @Column(name = "is_visited")
     private boolean isVisited;
 
     @NotNull
-    @Column(name = "isFlagged")
+    @Column(name = "is_flagged")
     private boolean isFlagged;
 
     @NotNull
-    @Column(name = "adjacentMines")
+    @Column(name = "adjacent_mines")
     private int adjacentMines;
 
     @ManyToOne
-    @JoinColumn(name = "gameId")
+    @JoinColumn(name = "game_id")
     private GameEntity gameEntity;
 }

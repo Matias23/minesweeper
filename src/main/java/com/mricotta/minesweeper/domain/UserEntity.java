@@ -25,7 +25,7 @@ import javax.persistence.Table;
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "userId")
+    @Column(name = "user_id")
     private Long userId;
 
     @NotNull
