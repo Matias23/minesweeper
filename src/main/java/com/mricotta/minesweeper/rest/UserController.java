@@ -7,6 +7,7 @@ import com.mricotta.minesweeper.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,13 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping( "/user")
 @Validated
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
 public class UserController {
 
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> createUser(@PathVariable String userName) {
-        return userService.createUser(userName);
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        return userService.createUser(user.getName());
     }
 
     @RequestMapping(value = {"/{userId:\\d+}"}, method = RequestMethod.GET)

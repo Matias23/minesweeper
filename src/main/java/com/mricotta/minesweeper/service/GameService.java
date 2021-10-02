@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 @Service
 @EnableAsync
 @Slf4j
-@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveClassLength"})
 @RequiredArgsConstructor
 public class GameService {
 
@@ -38,11 +37,18 @@ public class GameService {
     }
 
     private Game toGameDTO(GameEntity entity) {
-        return Game.builder().gameId(entity.getGameId()).build();
+        return Game.builder().gameId(entity.getGameId()).height(entity.getHeight()).width(entity.getWidth()).build();
     }
 
     private Cell toCellDTO(CellEntity entity) {
-        return Cell.builder().build();
+        return Cell.builder()
+            .xpos(entity.getXpos())
+            .ypos(entity.getYpos())
+            .adjacentMines(entity.getAdjacentMines())
+            .isFlagged(entity.isFlagged())
+            .isMined(entity.isMined())
+            .isVisited(entity.isVisited())
+            .build();
     }
 
     public ResponseEntity initializeGame(GameEntity gameEntity, GameRules gameRules) {
