@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 
 @RestController("minesweeperControllerV1")
-@RequestMapping( "/minesweeper")
+@RequestMapping( "/minesweeper/cell")
 @Validated
 @RequiredArgsConstructor
 public class MinesweeperController {
@@ -22,6 +22,16 @@ public class MinesweeperController {
     @RequestMapping(value = {"/{x:\\d+}/{y:\\d+}"}, method = RequestMethod.GET)
     public Optional<Cell> getCellByCoordinates(@PathVariable int x, @PathVariable int y) {
         return minesweeperService.getCellByCoordinates(x, y);
+    }
+
+    @RequestMapping(value = {"/visit/{x:\\d+}/{y:\\d+}"}, method = RequestMethod.PUT)
+    public Cell visitCellByCoordinates(@PathVariable int x, @PathVariable int y) {
+        return minesweeperService.visitCellByCoordinates(x, y);
+    }
+
+    @RequestMapping(value = {"/flag/{x:\\d+}/{y:\\d+}"}, method = RequestMethod.PUT)
+    public Cell flagCellByCoordinates(@PathVariable int x, @PathVariable int y) {
+        return minesweeperService.flagCellByCoordinates(x, y);
     }
 
 }

@@ -33,4 +33,18 @@ public class CellEntity {
     @NotNull
     @Column(name = "ypos")
     private Long ypos;
+
+    @NotNull
+    @Column(name = "isMined")
+    private boolean isMined;
+
+    @NotNull
+    @Column(name = "isVisited")
+    private boolean isVisited;
+
+    @NotNull
+    @Column(name = "isFlagged")
+    private boolean isFlagged;
+
+    // TODO verify if this should be stored or calculated private int adjacentMines;
 }

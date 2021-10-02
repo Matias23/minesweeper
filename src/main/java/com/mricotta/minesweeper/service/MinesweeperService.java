@@ -25,6 +25,30 @@ public class MinesweeperService {
         return cellRepository.findOneByCoordinate(x, y).map(this::toCellDTO);
     }
 
+    public Cell visitCellByCoordinates(int x, int y) {
+        CellEntity cellEntity = cellRepository.findOneByCoordinate(x, y).orElse(null);
+        if (cellEntity == null) {
+            //TODO cell is out of limits, print some error;
+        }
+        if (cellEntity.isVisited()) {
+            //TODO user has already visited it, should do nothing
+        }
+        if (cellEntity.isMined()) {
+            //TODO endgame
+        }
+        cellEntity.setVisited(true);
+        return toCellDTO(cellRepository.save(cellEntity));
+    }
+
+    public Cell flagCellByCoordinates(int x, int y) {
+        CellEntity cellEntity = cellRepository.findOneByCoordinate(x, y).orElse(null);
+        if (cellEntity == null) {
+            //TODO cell is out of limits, print some error;
+        }
+        cellEntity.setFlagged(true);
+        return toCellDTO(cellRepository.save(cellEntity));
+    }
+
     private Cell toCellDTO(CellEntity entity) {
         return Cell.builder().build();
     }
