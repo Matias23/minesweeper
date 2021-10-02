@@ -55,21 +55,52 @@ public class MinesweeperService {
     }
 
     public void initializeGame(GameRules gameRules) {
+        ////Creating all the cell entities
+        createCells(gameRules);
+
+        //Setting the bombs
+        putBombs(gameRules);
+
+        //Setting adjacent bombs number
+        settingAdjacentNumber(gameRules);
+    }
+
+    private void createCells(GameRules gameRules) {
         CellEntity cellEntity;
-        //Creating all the cell entities
         for (int row = 0; row < gameRules.getSize(); row++) {
             for (int column = 0; column < gameRules.getSize(); column++) {
                 cellEntity = CellEntity.builder()
-                    .isVisited(false)
-                    .isFlagged(false)
-                    .xpos(column)
-                    .ypos(row)
-                    .build();
+                        .isVisited(false)
+                        .isFlagged(false)
+                        .xpos(column)
+                        .ypos(row)
+                        .build();
                 cellRepository.save(cellEntity);
             }
         }
-        int mines = gameRules.getMines();
+    }
 
-        //We also need to set the adjacent bombs number
+    private void putBombs(GameRules gameRules) {
+        int mines = gameRules.getMines();
+        while (mines > 0) {
+            //TODO get new bomb coordinates in a random way
+            int x = -1;
+            int y = -1;
+            CellEntity minedCell = cellRepository.findOneByCoordinate(x, y).orElse(null);
+            minedCell.setMined(true);
+            cellRepository.save(minedCell);
+        }
+    }
+
+    private void settingAdjacentNumber(GameRules gameRules) {
+        for (int row = 0; row < gameRules.getSize(); row++) {
+            for (int column = 0; column < gameRules.getSize(); column++) {
+                CellEntity minedCell = cellRepository.findOneByCoordinate(row, column).orElse(null);
+                //TODO think a way of calculating this value
+                int adjacentMines = -1;
+                minedCell.setAdjacentMines(adjacentMines);
+                cellRepository.save(minedCell);
+            }
+        }
     }
 }
