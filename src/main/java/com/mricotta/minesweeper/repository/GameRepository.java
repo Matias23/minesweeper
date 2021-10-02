@@ -1,6 +1,7 @@
 package com.mricotta.minesweeper.repository;
 
 import com.mricotta.minesweeper.domain.CellEntity;
+import com.mricotta.minesweeper.domain.GameEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -8,8 +9,5 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CellRepository extends JpaRepository<CellEntity, Long> {
-
-    @Query("SELECT c FROM CellEntity c WHERE c.xpos = (:x) AND c.ypos = (:y) AND c.gameEntity.gameId = (:gameId)")
-    Optional<CellEntity> findOneByGameIdAndCoordinates(long gameId, int x, int y);
+public interface GameRepository extends JpaRepository<GameEntity, Long> {
 }
