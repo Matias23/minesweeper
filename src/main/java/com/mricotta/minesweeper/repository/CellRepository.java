@@ -12,4 +12,6 @@ public interface CellRepository extends JpaRepository<CellEntity, Long> {
 
     @Query("SELECT c FROM CellEntity c WHERE c.xpos = (:x) AND c.ypos = (:y) ")
     Optional<CellEntity> findOneByCoordinate(int x, int y);
+
+    //TODO continue it tomorrow
 }
