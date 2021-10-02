@@ -1,11 +1,8 @@
 package com.mricotta.minesweeper.rest;
 
-import com.mricotta.minesweeper.domain.GameEntity;
-import com.mricotta.minesweeper.rest.dto.Cell;
 import com.mricotta.minesweeper.rest.dto.Game;
 import com.mricotta.minesweeper.rest.dto.GameRules;
 import com.mricotta.minesweeper.rest.dto.User;
-import com.mricotta.minesweeper.service.MinesweeperService;
 import com.mricotta.minesweeper.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController("userControllerV1")
 @RequestMapping( "/user")

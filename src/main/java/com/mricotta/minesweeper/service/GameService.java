@@ -81,7 +81,7 @@ public class GameService {
         putBombs(gameEntity, gameRules, numberOfCells);
 
         //Setting adjacent bombs number
-        settingAdjacentNumber(gameRules);
+        settingAdjacentNumber(gameEntity, gameRules);
 
         return new ResponseEntity(HttpStatus.CREATED);
     }
@@ -120,40 +120,103 @@ public class GameService {
     }
 
     private void settingAdjacentNumber(GameEntity gameEntity, GameRules gameRules) {
+        int adjacentMines = 0;;
         for (int row = 0; row < gameRules.getHeight(); row++) {
             for (int column = 0; column < gameRules.getWidth(); column++) {
                 CellEntity cell = cellRepository.findOneByGameIdAndCoordinates(gameEntity.getGameId(), row, column).orElse(null);
-                /* TODO think a better way of calculating this value, since cell at the corners and borders
-                will only have 3/5 adjacent cells*/
-                int adjacentMines = 0;
-                adjacentMines += searchMine(row - 1, column, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += searchMine(row - 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += searchMine(row - 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += searchMine(row + 1, column, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += searchMine(row + 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += searchMine(row + 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += searchMine(row, column + 1, gameRules.getWidth(), gameRules.getHeight());
-                adjacentMines += searchMine(row, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                //Cell is at top level
+                if (row == 0) {
+                    //Cell is the top left corner
+                    if (column == 0) {
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                    //Cell is at top right corner
+                    } else if (column == gameRules.getWidth() - 1) {
+                        adjacentMines += searchMine(gameEntity.getGameId(), row, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column, gameRules.getWidth(), gameRules.getHeight());
+                    //Cell is in any middle position in the top
+                    } else {
+                        adjacentMines += searchMine(gameEntity.getGameId(), row, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                    }
+                //Cell is at bottom level
+                } else if (row == gameRules.getHeight() - 1) {
+                    //Cell is the bottom left corner
+                    if (column == 0) {
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                    //Cell is at bottom right corner
+                    } else if (column == gameRules.getWidth() - 1) {
+                        adjacentMines += searchMine(gameEntity.getGameId(), row, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column, gameRules.getWidth(), gameRules.getHeight());
+                    //Cell is in any middle position in the bottom
+                    } else {
+                        adjacentMines += searchMine(gameEntity.getGameId(), row, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                    }
+                //Cell is in the middle
+                } else {
+                    //Cell is in any middle position in the first column
+                    if (column == 0) {
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column, gameRules.getWidth(), gameRules.getHeight());
+                    //Cell is in any middle position in the last column
+                    } else if (column == gameRules.getWidth() - 1) {
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column, gameRules.getWidth(), gameRules.getHeight());
+                    //Cell is in the middle of the board
+                    } else {
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row, column + 1, gameRules.getWidth(), gameRules.getHeight());
+                        adjacentMines += searchMine(gameEntity.getGameId(), row, column - 1, gameRules.getWidth(), gameRules.getHeight());
+                    }
+                }
                 cell.setAdjacentMines(adjacentMines);
                 cellRepository.save(cell);
+                adjacentMines = 0;
             }
         }
     }
 
-    private int searchMine(int xpos, int ypos, int maxWidth, int maxHeight) {
+    private int searchMine(long gameId, int xpos, int ypos, int maxWidth, int maxHeight) {
         if (xpos < 0 || ypos < 0 || xpos >= maxWidth || ypos >= maxHeight) {
             return 0;
         }
-        CellEntity cellEntity = getCellEntityByCoordinates(xpos, ypos).orElse(null);
+        CellEntity cellEntity = getCellEntityByCoordinates(gameId, xpos, ypos).orElse(null);
         return cellEntity.isMined() ? 1 : 0;
     }
 
-    private Optional<CellEntity> getCellEntityByCoordinates(int x, int y) {
-        return cellRepository.findOneByCoordinate(x, y);
+    private Optional<CellEntity> getCellEntityByCoordinates(long gameId, int x, int y) {
+        return cellRepository.findOneByGameIdAndCoordinates(gameId, x, y);
     }
 
-    public ResponseEntity resetGame(long userId) {
-        cellRepository.deleteAll();
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    public ResponseEntity<List<Cell>> getBoard(long gameId) {
+    }
+
+    public ResponseEntity<Cell> visitCellByCoordinates(long gameId, int x, int y) {
+    }
+
+    public ResponseEntity<Cell> flagCellByCoordinates(long gameId, int x, int y) {
     }
 }
