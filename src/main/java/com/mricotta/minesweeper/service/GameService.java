@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @EnableAsync
@@ -39,33 +40,9 @@ public class GameService {
         return Game.builder().gameId(entity.getGameId()).build();
     }
 
-//    public ResponseEntity visitCellByCoordinates(long userId, int x, int y) {
-//        CellEntity cellEntity = cellRepository.findOneByUserIdAndCoordinates(x, y).orElse(null);
-//        if (cellEntity == null) {
-//            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-//        }
-//        if (cellEntity.isVisited()) {
-//            return new ResponseEntity(HttpStatus.OK);
-//        }
-//        if (cellEntity.isMined()) {
-//            return new ResponseEntity(HttpStatus.CONFLICT);
-//        }
-//        cellEntity.setVisited(true);
-//        return new ResponseEntity(toCellDTO(cellRepository.save(cellEntity)), HttpStatus.OK);
-//    }
-//
-//    public ResponseEntity<Cell> flagCellByCoordinates(long userId, int x, int y) {
-//        CellEntity cellEntity = cellRepository.findOneByCoordinate(x, y).orElse(null);
-//        if (cellEntity == null) {
-//            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-//        }
-//        cellEntity.setFlagged(true);
-//        return new ResponseEntity(toCellDTO(cellRepository.save(cellEntity)), HttpStatus.OK);
-//    }
-//
-//    private Cell toCellDTO(CellEntity entity) {
-//        return Cell.builder().build();
-//    }
+    private Cell toCellDTO(CellEntity entity) {
+        return Cell.builder().build();
+    }
 
     public ResponseEntity initializeGame(GameEntity gameEntity, GameRules gameRules) {
         int numberOfCells = gameRules.getHeight() * gameRules.getWidth() - 1;
@@ -131,12 +108,12 @@ public class GameService {
                         adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row, column + 1, gameRules.getWidth(), gameRules.getHeight());
-                    //Cell is at top right corner
+                        //Cell is at top right corner
                     } else if (column == gameRules.getWidth() - 1) {
                         adjacentMines += searchMine(gameEntity.getGameId(), row, column - 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column, gameRules.getWidth(), gameRules.getHeight());
-                    //Cell is in any middle position in the top
+                        //Cell is in any middle position in the top
                     } else {
                         adjacentMines += searchMine(gameEntity.getGameId(), row, column - 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
@@ -144,19 +121,19 @@ public class GameService {
                         adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row, column + 1, gameRules.getWidth(), gameRules.getHeight());
                     }
-                //Cell is at bottom level
+                    //Cell is at bottom level
                 } else if (row == gameRules.getHeight() - 1) {
                     //Cell is the bottom left corner
                     if (column == 0) {
                         adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row, column + 1, gameRules.getWidth(), gameRules.getHeight());
-                    //Cell is at bottom right corner
+                        //Cell is at bottom right corner
                     } else if (column == gameRules.getWidth() - 1) {
                         adjacentMines += searchMine(gameEntity.getGameId(), row, column - 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column, gameRules.getWidth(), gameRules.getHeight());
-                    //Cell is in any middle position in the bottom
+                        //Cell is in any middle position in the bottom
                     } else {
                         adjacentMines += searchMine(gameEntity.getGameId(), row, column - 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
@@ -164,7 +141,7 @@ public class GameService {
                         adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row, column + 1, gameRules.getWidth(), gameRules.getHeight());
                     }
-                //Cell is in the middle
+                    //Cell is in the middle
                 } else {
                     //Cell is in any middle position in the first column
                     if (column == 0) {
@@ -173,14 +150,14 @@ public class GameService {
                         adjacentMines += searchMine(gameEntity.getGameId(), row, column + 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column + 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column, gameRules.getWidth(), gameRules.getHeight());
-                    //Cell is in any middle position in the last column
+                        //Cell is in any middle position in the last column
                     } else if (column == gameRules.getWidth() - 1) {
                         adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row, column - 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row + 1, column, gameRules.getWidth(), gameRules.getHeight());
-                    //Cell is in the middle of the board
+                        //Cell is in the middle of the board
                     } else {
                         adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column, gameRules.getWidth(), gameRules.getHeight());
                         adjacentMines += searchMine(gameEntity.getGameId(), row - 1, column - 1, gameRules.getWidth(), gameRules.getHeight());
@@ -212,11 +189,31 @@ public class GameService {
     }
 
     public ResponseEntity<List<Cell>> getBoard(long gameId) {
+        return new ResponseEntity(cellRepository.findAllByGameId(gameId).stream().map(cell -> toCellDTO(cell)).collect(Collectors.toList()), HttpStatus.OK);
     }
 
     public ResponseEntity<Cell> visitCellByCoordinates(long gameId, int x, int y) {
+        CellEntity cellEntity = cellRepository.findOneByGameIdAndCoordinates(gameId, x, y).orElse(null);
+        if (cellEntity == null) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        if (cellEntity.isVisited()) {
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        if (cellEntity.isMined()) {
+            return new ResponseEntity(HttpStatus.CONFLICT);
+        }
+        cellEntity.setVisited(true);
+        return new ResponseEntity(toCellDTO(cellRepository.save(cellEntity)), HttpStatus.OK);
     }
 
     public ResponseEntity<Cell> flagCellByCoordinates(long gameId, int x, int y) {
+        CellEntity cellEntity = cellRepository.findOneByGameIdAndCoordinates(gameId, x, y).orElse(null);
+        if (cellEntity == null) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        cellEntity.setFlagged(true);
+        return new ResponseEntity(toCellDTO(cellRepository.save(cellEntity)), HttpStatus.OK);
     }
+
 }
