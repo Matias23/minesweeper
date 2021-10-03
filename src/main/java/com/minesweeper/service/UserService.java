@@ -1,11 +1,11 @@
-package com.mricotta.minesweeper.service;
+package com.minesweeper.service;
 
-import com.mricotta.minesweeper.domain.GameEntity;
-import com.mricotta.minesweeper.domain.UserEntity;
-import com.mricotta.minesweeper.repository.UserRepository;
-import com.mricotta.minesweeper.rest.dto.Game;
-import com.mricotta.minesweeper.rest.dto.GameRules;
-import com.mricotta.minesweeper.rest.dto.User;
+import com.minesweeper.domain.GameEntity;
+import com.minesweeper.domain.UserEntity;
+import com.minesweeper.repository.UserRepository;
+import com.minesweeper.rest.dto.Game;
+import com.minesweeper.rest.dto.GameRules;
+import com.minesweeper.rest.dto.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,13 +32,18 @@ public class UserService {
     }
 
     public ResponseEntity<User> getUser(long userId) {
-        return new ResponseEntity(toUserDTO(userRepository.getById(userId)), HttpStatus.OK);
+        return new ResponseEntity(toUserDTO(userRepository.findById(userId).orElse(null)), HttpStatus.OK);
     }
 
     public ResponseEntity<Game> initializeGame(long userId, GameRules gameRules) {
-        UserEntity userEntity = userRepository.getById(userId);
-        GameEntity gameEntity = GameEntity.builder().width(gameRules.getWidth()).height(gameRules.getHeight()).userEntity(userEntity).build();
+        UserEntity userEntity = userRepository.findById(userId).orElse(null);
+        GameEntity gameEntity = GameEntity.builder()
+            .width(gameRules.getWidth())
+            .height(gameRules.getHeight())
+            .mines(gameRules.getMines())
+            .userEntity(userEntity).build();
+        Game game = gameService.createGame(gameEntity);
         gameService.initializeGame(gameEntity, gameRules);
-        return gameService.createGame(gameEntity);
+        return new ResponseEntity(game, HttpStatus.CREATED);
     }
 }

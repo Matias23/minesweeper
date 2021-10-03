@@ -1,4 +1,4 @@
-package com.mricotta.minesweeper.domain;
+package com.minesweeper.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,11 +37,14 @@ public class GameEntity {
     @Column(name = "height")
     private int height;
 
+    @Column(name = "mines")
+    private int mines;
+
     @OneToOne
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
 
     @OneToMany(mappedBy = "gameEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("xpos ASC, ypos ASC")
+    @OrderBy("cellId.xpos ASC, cellId.ypos ASC")
     private List<CellEntity> cellEntities;
 }

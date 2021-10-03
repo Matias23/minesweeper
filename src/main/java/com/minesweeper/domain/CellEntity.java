@@ -1,4 +1,4 @@
-package com.mricotta.minesweeper.domain;
+package com.minesweeper.domain;
 
 import com.sun.istack.internal.NotNull;
 import lombok.AllArgsConstructor;
@@ -8,11 +8,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.EmbeddedId;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
 
 @Data
@@ -23,18 +22,9 @@ import javax.persistence.Table;
 @javax.persistence.Entity
 @Table(name = "cell")
 public class CellEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "cell_id")
-    private Long id;
 
-    @NotNull
-    @Column(name = "x_pos")
-    private int xpos;
-
-    @NotNull
-    @Column(name = "y_pos")
-    private int ypos;
+    @EmbeddedId
+    private CellId cellId;
 
     @NotNull
     @Column(name = "is_mined")
@@ -53,6 +43,6 @@ public class CellEntity {
     private int adjacentMines;
 
     @ManyToOne
-    @JoinColumn(name = "game_id")
+    @MapsId("gameId")
     private GameEntity gameEntity;
 }

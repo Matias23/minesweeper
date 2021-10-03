@@ -1,17 +1,15 @@
-package com.mricotta.minesweeper.service;
+package com.minesweeper.service;
 
-import com.mricotta.minesweeper.domain.CellEntity;
-import com.mricotta.minesweeper.domain.GameEntity;
-import com.mricotta.minesweeper.domain.UserEntity;
-import com.mricotta.minesweeper.repository.CellRepository;
-import com.mricotta.minesweeper.repository.GameRepository;
-import com.mricotta.minesweeper.rest.dto.Cell;
-import com.mricotta.minesweeper.rest.dto.Game;
-import com.mricotta.minesweeper.rest.dto.GameRules;
-import com.mricotta.minesweeper.rest.dto.User;
+import com.minesweeper.domain.CellEntity;
+import com.minesweeper.domain.CellId;
+import com.minesweeper.domain.GameEntity;
+import com.minesweeper.repository.CellRepository;
+import com.minesweeper.repository.GameRepository;
+import com.minesweeper.rest.dto.Cell;
+import com.minesweeper.rest.dto.Game;
+import com.minesweeper.rest.dto.GameRules;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -32,18 +30,23 @@ public class GameService {
     private final GameRepository gameRepository;
     private final CellRepository cellRepository;
 
-    public ResponseEntity<Game> createGame(GameEntity entity) {
-        return new ResponseEntity(toGameDTO(gameRepository.save(entity)), HttpStatus.CREATED);
+    public Game createGame(GameEntity entity) {
+        return toGameDTO(gameRepository.save(entity));
     }
 
     private Game toGameDTO(GameEntity entity) {
-        return Game.builder().gameId(entity.getGameId()).height(entity.getHeight()).width(entity.getWidth()).build();
+        return Game.builder()
+            .gameId(entity.getGameId())
+            .height(entity.getHeight())
+            .width(entity.getWidth())
+            .mines(entity.getMines())
+            .build();
     }
 
     private Cell toCellDTO(CellEntity entity) {
         return Cell.builder()
-            .xpos(entity.getXpos())
-            .ypos(entity.getYpos())
+            .xpos(entity.getCellId().getXpos())
+            .ypos(entity.getCellId().getYpos())
             .adjacentMines(entity.getAdjacentMines())
             .isFlagged(entity.isFlagged())
             .isMined(entity.isMined())
@@ -77,8 +80,11 @@ public class GameService {
                 cellEntity = CellEntity.builder()
                         .isVisited(false)
                         .isFlagged(false)
-                        .xpos(column)
-                        .ypos(row)
+                        .cellId(CellId.builder()
+                            .gameId(gameEntity.getGameId())
+                            .xpos(column)
+                            .ypos(row)
+                            .build())
                         .gameEntity(gameEntity)
                         .build();
                 cellRepository.save(cellEntity);
@@ -213,24 +219,37 @@ public class GameService {
         if (cellEntity == null) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        if (cellEntity.isVisited()) {
-            return new ResponseEntity(HttpStatus.OK);
-        }
         if (cellEntity.isMined()) {
-            //TODO this ends the game
+            //TODO user lost
             return new ResponseEntity(HttpStatus.CONFLICT);
         }
 
         CellEntity visited = visitCellEntity(gameId, cellEntity);
+
+        if (isGameEnded(gameId)) {
+            //TODO user won the game
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
         return new ResponseEntity(toCellDTO(visited), HttpStatus.OK);
     }
 
+    private boolean isGameEnded(long gameId) {
+        GameEntity gameEntity = gameRepository.findById(gameId).orElse(null);
+        int totalCells = gameEntity.getHeight() * gameEntity.getWidth();
+        int bombs = gameEntity.getMines();
+        int visitedCells = cellRepository.countVisitedCellsByGameId(gameId);
+        return visitedCells + bombs == totalCells;
+    }
+
     private CellEntity visitCellEntity(long gameId, CellEntity cellEntity) {
+        if (cellEntity.isVisited()) {
+            return cellEntity;
+        }
         cellEntity.setVisited(true);
         //Check if adjacent has mines, if not then visit them
-        GameEntity gameEntity = gameRepository.getById(gameId);
+        GameEntity gameEntity = gameRepository.findById(gameId).orElse(null);
         List<Cell> adjacents = getAdjacents(toCellDTO(cellEntity), gameEntity.getWidth(), gameEntity.getHeight());
-        if (searchMines(gameId, adjacents, gameEntity.getWidth(), gameEntity.getHeight()) > 0) {
+        if (searchMines(gameId, adjacents, gameEntity.getWidth(), gameEntity.getHeight()) == 0) {
             CellEntity adjacentEntity;
             for (Cell adjacent : adjacents) {
                 adjacentEntity = getCellEntityByCoordinates(gameId, adjacent.getXpos(), adjacent.getXpos()).orElse(null);

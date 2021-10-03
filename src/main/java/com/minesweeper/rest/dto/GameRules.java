@@ -1,4 +1,4 @@
-package com.mricotta.minesweeper.rest.dto;
+package com.minesweeper.rest.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,13 +13,9 @@ import lombok.ToString;
 @ToString
 @Builder
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessivePublicCount", "PMD.SingularField"})
-public class Cell {
+public class GameRules {
 
-    private Long id;
-    private int xpos;
-    private int ypos;
-    private boolean isMined;
-    private boolean isVisited;
-    private boolean isFlagged;
-    private int adjacentMines;
+    private int width;
+    private int height;
+    private int mines;
 }

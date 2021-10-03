@@ -1,4 +1,4 @@
-package com.mricotta.minesweeper.rest.dto;
+package com.minesweeper.rest.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

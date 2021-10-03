@@ -1,9 +1,9 @@
-package com.mricotta.minesweeper.rest;
+package com.minesweeper.rest;
 
-import com.mricotta.minesweeper.rest.dto.Game;
-import com.mricotta.minesweeper.rest.dto.GameRules;
-import com.mricotta.minesweeper.rest.dto.User;
-import com.mricotta.minesweeper.service.UserService;
+import com.minesweeper.rest.dto.Game;
+import com.minesweeper.rest.dto.User;
+import com.minesweeper.service.UserService;
+import com.minesweeper.rest.dto.GameRules;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

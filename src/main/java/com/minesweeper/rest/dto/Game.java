@@ -1,4 +1,4 @@
-package com.mricotta.minesweeper.rest.dto;
+package com.minesweeper.rest.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,6 +16,7 @@ import lombok.ToString;
 public class Game {
 
     private Long gameId;
+    private int mines;
     private int width;
     private int height;
 }

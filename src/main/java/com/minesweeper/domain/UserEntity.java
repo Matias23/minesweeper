@@ -1,4 +1,4 @@
-package com.mricotta.minesweeper.domain;
+package com.minesweeper.domain;
 
 import com.sun.istack.internal.NotNull;
 import lombok.AllArgsConstructor;
